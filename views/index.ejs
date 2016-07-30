@@ -1,0 +1,24 @@
+<%- include header%>
+    <%
+        if(posts == null || posts.length == 0){
+    %>
+            <p>there is no post anymore</p>
+    <%
+        }else{
+
+        posts.forEach(function(post,index){
+    %>
+
+    <p><h2>title:<a href="#"><%=post.title%></a></h2></p>
+    <p class="info">
+        author:<a href="#"><%=post.name%><%=post.name%></a>|
+        date:<%=post.time.day%>
+    </p>
+
+    <p><%=post.post%></p>
+    <%
+        })
+     }
+    %>
+
+<%- include footer%>
