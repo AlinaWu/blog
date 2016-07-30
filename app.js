@@ -15,7 +15,7 @@ var flash = require('connect-flash');
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 4000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(flash());
@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.cookieParser());//Cookie parsing middleware
-app.use(express.bodyParser({keepExtensions:true,uploadDir:'./public/images'}));
+app.use(express.bodyParser({keepExtensions:true}));
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 //session cache
 app.use(express.session({

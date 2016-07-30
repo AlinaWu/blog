@@ -9,12 +9,14 @@
 
 var crypto = require('crypto'),
 	fs = require('fs'),
+	util = require('util'),
     User = require('../models/user.js'),
 	Post = require('../models/post.js');
 module.exports = function(app){
 
 	app.get('/',function(req,res){
-		Post.get(null,function(err,posts){
+		console.log("find all users blogs.....");
+		Post.getAll(null,function(err,posts){
 			if(err){
 				console.log("is err ="+err);
 				posts = [];
@@ -162,9 +164,56 @@ module.exports = function(app){
 	app.post('/upload',checkLogin);
 	app.post('/upload',function(req,res){
 		console.log('begin to upload...');
+		for(var i in req.files){
+			if(req.files[i].size == 0){
+				fs.unlinkSync(req.files[i].path);
+				console.log('successfully removed an empty file');
+			}else{
+				var targetPath = './public/images/'+req.files[i].name;
+				//fs.renameSync(req.files[i].path,targetPath);
+
+				var readStream = fs.createReadStream(req.files[i].path)
+				var writeStream = fs.createWriteStream(targetPath);
+				/*util.pump(readStream, writeStream, function() {
+					fs.unlinkSync(req.files[i].path);
+				});*/
+
+				readStream.pipe(writeStream,function(){
+					fs.unlinkSync(req.files[i].path);
+				});
+
+				console.log('successfully renamed a file')
+			}
+		}
 		req.flash('success','upload file success');
+		res.redirect('/upload');
 	});
 
+
+
+	app.get('/u/:name',function(req,res){
+		var userName = req.params.name;
+		User.get(userName,function(err,user){
+			if(!user){
+				console.log(userName+"not exist.");
+				req.flash('error',userName+"not exist.");
+				res.redirect('/');
+			}
+			Post.getAll(userName,function(err,posts){
+				if(err){
+					req.flash('error',err);
+					return res.redirect('/');
+				}
+				res.render('user',{
+					title:user.name,
+					posts:posts,
+					user:req.session.user,
+					success:req.flash('success').toString(),
+					error:req.flash('error').toString()
+				});
+			});
+		});
+	});
 
 
 }
